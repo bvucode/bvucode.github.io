@@ -7,6 +7,13 @@ section {
     border: solid black 1px;
 }
 
+.hero {
+	background-color: #1c1d25;
+    height: 100vh;
+    color: white;
+    font-size: 40px;
+}
+
 .hero-area {
 	height:  100%;
 	justify-content: space-between;
@@ -16,13 +23,6 @@ section {
 header {
 	margin-left: 80px;
 	margin-bottom: 200px;
-}
-
-.hero {
-	background-color: #1c1d25;
-    height: 100vh;
-    color: white;
-    font-size: 40px;
 }
 
 h1{
@@ -50,5 +50,5 @@ p {
 
 .social {
 	margin: 10px;
-	color: black;
+	color: white;
 }
