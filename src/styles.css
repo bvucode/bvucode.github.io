@@ -20,7 +20,7 @@ header {
 	margin-bottom: 200px;
 }
 
-@media (min-width: 720px) {
+@media (min-width: 1500px) {
 	h1{
 		font-size: 90px;
 	    margin: 0;
