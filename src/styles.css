@@ -1,11 +1,11 @@
 body {
 	font-family: 'Poppins', sans-serif;
+	padding: 0;
 }
 
 section {
 	background-color: #1c1d25;
 	color: white;
-	width: 750px;
 	height: 160vh;
 	font-size: 40px;
 	padding: 10px;
