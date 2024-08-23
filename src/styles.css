@@ -5,6 +5,7 @@ body {
 main {
 	background-color: #1c1d25;
 	color: white;
+	height: 100vh;
 	font-size: 40px;
 	padding: 10px;
 }
@@ -36,12 +37,12 @@ header {
 	header {
 		margin-left: 80px;
 		margin-bottom: 100px;
-}
+	}
 
 	.text {
 		margin-left: 80px;
 	    margin-bottom: 200px;
-}
+	}
 
 }
 
