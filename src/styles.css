@@ -2,12 +2,12 @@ body {
 	font-family: 'Poppins', sans-serif;
 }
 
-section {
+main {
 	background-color: #1c1d25;
 	color: white;
+	height: 120vh;
 	font-size: 40px;
 	padding: 10px;
-	display:inline-block;
 }
 
 header {
@@ -21,7 +21,7 @@ header {
 }
 
 @media (min-width: 1500px) {
-	section {
+	main {
 	    background-color: #1c1d25;
 	    color: white;
 	    height: 100vh;
