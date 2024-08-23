@@ -4,12 +4,18 @@ body {
 
 section {
 	background-color: #1c1d25;
-    height: 100vh;
-    color: white;
-    font-size: 40px;
+	color: white;
+	height: 100vh;
+	font-size: 40px;
+	padding: 10px;
 }
 
 header {
+	margin-left: 80px;
+	margin-bottom: 100px;
+}
+
+.text {
 	margin-left: 80px;
 	margin-bottom: 200px;
 }
@@ -23,21 +29,16 @@ p {
 	margin: 0;
 	font-size: 30px;
 	font-weight: 300;
-}
 
-.text {
-	margin-left: 80px;
-	margin-bottom: 200px;
 }
 
 footer {
 	margin-left: 80px;
-	padding-bottom: 200px;
+	padding-bottom: 10px;
 	display: flex;
-
 }
 
 .social {
-	margin: 10px;
 	color: white;
+	margin-right: 10;
 }
