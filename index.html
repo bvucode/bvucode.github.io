@@ -6,7 +6,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" /> 
   <meta charset = "utf-8"/>
-  <meta name = "viewport" content="width=device-width, initial-scale=0.5"/>
+  <meta name = "viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name = "author" content = "Bulat Valiakhmetov" />
   <title>portfolio site</title>
 </head>
@@ -15,24 +15,49 @@
    <h1>BV</h1>
   </header>
   <main>
-    <h1>Bulat Valiakhmetov</h1>
-    <div class="text">
-      <p>Web Developer</p>
-      <p>I code in Python, JavaScript, Html, Css.</p>
-      <p>Use FastAPI, React, PostgresSQL, Rest, Linux, Git.</p>
-    </div>
+      <h2>Запуск Linux на устройствах Android без поддержки AVF</h2>
+      
+
+С выходом Android 13 в платформу был добавлен Android Virtualization Framework (AVF), основанный на гипервизоре KVM и инструментарии Crosvm. Это позволило запускать виртуальные машины с другими операционными системами. В Android 15 для устройств Google Pixel был добавлен Linux-терминал.
+
+В этой статье я поделюсь своим опытом запуска Linux на телефонах, отличных от Pixel, без поддержки AVF. Я успешно запускаю виртуальную машину с доступом в Интернет, SSH, GUI и общим каталогом на своем Xiaomi Poco C65 с Android 15 (также работает с Android 14 с ядром 6.1).
+
+Шаги для запуска Linux на Android
+
+    Использование Crosvm:
+
+    Для загрузки Debian я использую Crosvm. Файл Crosvm находится по пути:
+
+    /apex/com.android.virt/bin
+
+    Для доступа к этой директории требуется Root на устройстве.
+
+    Компиляция ядра Linux ARM64:
+
+    Сначала необходимо скомпилировать ядро Linux ARM64.
+
+    Создание образа с дистрибутивом:
+
+    Я рекомендую использовать Debootstrap для создания образа с дистрибутивом.
+
+    Настройка Интернета:
+
+    Поскольку настройка интернета из официального руководства не всегда работает, я использую Gvisor. Этот метод я увидел в инструкции автора Christopher L. Crutchfield, который запускал Ubuntu на Pixel, когда в Android 14 не было приложения Linux-терминала.
+
+    Настройка SSH:
+
+    В другой инструкции автора также представлена настройка SSH.
+
+    GUI:
+
+    Для графического интерфейса можно использовать VNC и приложение Xserver XSDL для Android.
+
+    Настройка общих папок:
+
+    Общие папки настраиваются по инструкции к Crosvm. Дополнительные возможности Вы можете запустить несколько виртуальных машин, если разместите бинарный файл Crosvm в другую директорию с образом и ядром.
+
+Заключение В итоге, у меня есть ARM64 Linux в виртуальной машине на телефоне. Если Вас интересует более подробная информация, Вы можете ознакомиться с моей инструкцией на GitHub.
+
   </main>
-  <footer>
-    <div>
-      <a href ="https://github.com/bvucode" class="social">github</a>
-    </div>
-    <div>
-      <a href ="https://youtube.com/@bulatvaliakhmetov" class="social">youtube</a>
-    </div>
-    <div>
-      <a href ="https://instagram.com/bulatv2" class="social">instagram</a>
-    </div>
-  </footer>
-  <script src=""></script>
 <body>
 </html>
