@@ -10,17 +10,9 @@ header {
 	margin-left: 5px;
 }
 
-main {
-	background-color: #1c1d25;
-	color: white;
-	height: 100vh;
-	font-size: 40px;
-	margin-right: 5px;
-	margin-left: 5px;
-}
 
 h1{
-    font-size: 90px;
+    font-size: 60px;
 	margin: 0;
 	margin-left: 40px;
 }
