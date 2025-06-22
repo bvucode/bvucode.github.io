@@ -1,0 +1,265 @@
+<! DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href ="src/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" /> 
+  <meta charset = "utf-8"/>
+  <meta name = "viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name = "author" content = "Bulat Valiakhmetov" />
+  <title>Blog Site</title>
+</head>
+<body>
+  <header>
+   <h2>BV</h2>
+  </header>
+  <main>
+      <h2>Запуск Linux на устройствах Android без поддержки AVF</h2>
+      <p>В этой статье я поделюсь своим опытом запуска Linux на рутованом non-Pixel телефоне с Android 15 (также работает с Android 14 с ядром 6.1) c помощью
+        Crosvm, без поддержки AVF. С доступом в Интернет, SSH, GUI и общим каталогом. Мой телефон Xiaomi Poco C65 c Android 15. С выходом Android 13 на
+        телефонах Google Pixel в платформу был добавлен Android Virtualization Framework (AVF), основанный на гипервизоре KVM и инструментарии Crosvm. Это позволило
+        запускать виртуальные машины с Linux. В Android 15 для устройств Google Pixel был добавлен Linux-терминал.
+        </p>
+        <h3>Шаги для запуска Linux на Android</h3>
+        <ol>
+          <li>Использование Crosvm: Для загрузки Debian я использую Crosvm. Файл Crosvm находится по пути: /apex/com.android.virt/bin Для доступа к этой директории требуется Root на устройстве.</li>
+          <li>Компиляция ядра Linux ARM64: Сначала необходимо скомпилировать ядро Linux ARM64.</li>
+          <li>Создание образа с дистрибутивом: Я рекомендую использовать Debootstrap для создания образа с дистрибутивом.</li>
+          <li>Настройка Интернета: Поскольку настройка интернета из официального руководства не всегда работает, я использую Gvisor.</li>
+          <li>Настройка SSH: настройка виртуального сетевого устройства Tap.</li>
+          <li>GUI: Для графического интерфейса можно использовать Xserver XSDL для Android.</li>
+          <li>Настройка общих папок: Общие папки настраиваются по инструкции к Crosvm.</li>
+        </ol>
+        <h3>Установка зависимостей</h3>
+        <p>Для начала необходимо установить некоторые зависимости</p>
+        <p>Откройте терминал и выполните следующие команды:</p>
+        <pre><code>
+        $ sudo apt install build-essential debootstrap qemu-user-static gcc-aarch64-linux-gnu atftpd nfs-kernel-server fdisk libcap-dev libgbm-dev pkg-config protobuf-compiler bc bison flex libssl-dev make libc6-dev libncurses5-dev crossbuild-essential-arm64
+        $ rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz
+        </code></pre>
+        <p>После этого добавьте путь к Go в Ваш ~/.bashrc:</p>
+        <pre><code>
+        export PATH=$PATH:/usr/local/go/bin
+        </code></pre>
+        <h3>Сборка ядра</h3>
+        <p>Скачайте tarball ядра с kernel.org:</p>
+        <pre><code>
+        $ tar -xvf linux-x.x.xx.tar.xz
+        $ cd linux-x.x.xx
+        $ make ARCH=arm64 defconfig
+        </code></pre>
+        <p>Затем включите необходимые настройки: CONFIG_VSOCKETS=y</p>
+        <pre><code>
+        $ make menuconfig
+        $ CROSS_COMPILE=aarch64-linux-gnu- make ARCH=arm64 -j 8
+        </code></pre>
+        <p>Кросс-компиляция gVisor Proxy</p>
+        <p>Сначала кросс-компилируем gVisor Proxy для aarch64:</p>
+        <pre><code>
+        git clone https://github.com/containers/gvisor-tap-vsock gvisor-tap-vsock-arm64
+        GOARCH=arm64 make
+        </code></pre>
+        <p>Затем кросс-компилируем gVisor Proxy для Android:</p>
+        <pre><code>
+        git clone https://github.com/containers/gvisor-tap-vsock gvisor-tap-vsock-android
+        GOOS=android GOARCH=arm64 make
+        </code></pre>
+        <h3>Создание rootfs</h3>
+        <p>Создайте файловую систему rootfs:</p>
+        <pre><code>
+        $ mkdir rootfs
+        $ dd if=/dev/zero of=debian.img bs=1M count=32000
+        $ sudo mkfs.ext4 debian.img
+        $ sudo mount debian.img rootfs/
+        $ sudo debootstrap --arch=arm64 buster rootfs/
+        </code></pre>
+        <p>Настройте hostname и DNS:</p>
+        <pre><code>
+        $ echo "vm" | sudo tee ./rootfs/etc/hostname
+        $ sudo mkdir -p ./rootfs/etc/systemd/resolved.conf.d/
+        $ sudo nvim ./rootfs/etc/systemd/resolved.conf.d/dns_servers.conf
+        </code></pre>
+        <p>Установите DNS-серверы:</p>
+        <pre><code>
+        [Resolve]
+        DNS=8.8.8.8 1.1.1.1
+        </code></pre>
+        <p>Создайте пользователя и завершите настройку:</p>
+        <pre><code>
+        $ sudo chroot ./rootfs /bin/bash
+        $ useradd -m -g sudo <usermane>
+        $ passwd <username>
+        $ chsh -s /bin/bash <username>
+        $ exit
+        </code></pre>
+        <p>Скопируйте gVisor Proxy в rootfs:</p>
+        <pre><code>
+        $ sudo mkdir -p ./rootfs/gvisor-tap-vsock
+        $ sudo cp -r ./gvisor-tap-vsock-arm64/bin/* ./rootfs/gvisor-tap-vsock/bin
+        $ sudo umount ./rootfs
+        </code></pre>
+        <p>Подготовка файлов</p>
+        <p>Соберите необходимые файлы в архив:</p>
+        <pre><code>
+        $ tar -czvf gvisor-tap-vsock-android.tar.gz ./gvisor-tap-vsock-android/bin/*
+        </code></pre>
+        <h3>Настройка сети</h3>
+        <p>Создайте скрипт для настройки TAP-интерфейса:</p>
+        <pre><code>
+        $ nvim network.sh
+        </code></pre>
+        <p>Добавьте в него следующие строки:</p>
+        <pre><code>
+        #!/data/data/com.termux/files/usr/bin/sh
+        
+        # https://crosvm.dev/book/devices/net.html
+        ip tuntap add mode tap user $USER vnet_hdr crosvm_tap
+        ip addr add 192.168.10.1/24 dev crosvm_tap
+        ip link set crosvm_tap up
+        
+        # routing
+        sysctl net.ipv4.ip_forward=1
+        HOST_DEV=$(ip route get 8.8.8.8 | awk -- '{printf $5}')
+        iptables -t nat -A POSTROUTING -o "${HOST_DEV}" -j MASQUERADE
+        iptables -A FORWARD -i "${HOST_DEV}" -o crosvm_tap -m state --state RELATED,ESTABLISHED -j ACCEPT
+        iptables -A FORWARD -i crosvm_tap -o "${HOST_DEV}" -j ACCEPT
+        
+        # the main route table needs to be added
+        ip rule add from all lookup main pref 1
+        </code></pre>
+        <p>На Android настройка сети из документации Crosvm не работает. Проблема в том, что Android не добавляет основную таблицу маршрута в свою файловую систему. Чтобы исправить эту проблему, необходимо добавить основной таблицу маршрута:</p>
+        <pre><code>
+        ip rule add from all lookup main pref 1
+        </code></pre>
+        <p>Установите Termux из F-Droid</p>
+        <p>Затем выполните следующие команды:</p>
+        <pre><code>
+        # termux-setup-storage
+        # mkdir kvm
+        </code></pre>
+        <p>Скопируйте необходимые файлы в директорию /data/data/com.termux/files/home/kvm:</p>
+        debian.img
+        gvisor-tap-vsock-android.tar.gz
+        network.sh
+        ./linux-x.x.xx/arch/arm64/boot/Image
+        <p>В Termux выполните:</p>
+        <pre><code>
+        # su
+        # cd /data/data/com.termux/files/home/kvm
+        # chmod +x network.sh
+        # ./network.sh
+        </code></pre>
+        <p>Затем распакуйте gVisor:</p>
+        <pre><code>
+        # cd /data/data/com.termux/files/home/kvm
+        # tar -xvf gvisor-tap-vsock-android.tar.gz
+        # cd gvisor-tap-vsock-android/bin
+        # su
+        # chmod +x gvproxy
+        # ./gvproxy -debug -listen vsock://:1024 -listen unix:///data/data/com.termux/files/home/kvm/network.sock
+        </code></pre>
+        <p>Запуск виртуальной машины с Debian</p>
+        <p>В новой сессии Termux выполните:</p>
+        <pre><code>
+        # su
+        # cd /apex/com.android.virt/bin
+        # ./crosvm run --disable-sandbox --net tap-name=crosvm_tap -s /data/data/com.termux/files/home/kvm/crosvm.sock --shared-dir "/data/data/com.termux/files/home/host_shared_dir:my_shared_tag:type=fs" -p 'init=/sbin/init' --rwroot /data/data/com.termux/files/home/kvm/debian.img /data/data/com.termux/files/home/kvm/Image --vsock 3 --mem 2048 --cpus 8
+        </code></pre>
+        <p>В гостевой системе</p>
+        <p>Внутри виртуальной машины выполните:</p>
+        <pre><code>
+        $ cd /gvisor-tap-vsock/bin
+        $ sudo chmod +x gvforwarder
+        $ sudo ./gvforwarder --debug &
+        </code></pre>
+        Или:
+        <pre><code>
+        $ sudo ./gvforwarder --debug > /dev/null 2>&1 &
+        </code></pre>
+        <p>Проверьте подключение:</p>
+        <pre><code>
+        $ ping 8.8.8.8
+        </code></pre>
+        <p>Для работы интернета необходимо включить точку доступа(раздачу интернета) и подключить какой либо девайс</p>
+        <h3>Настройка SSH</h3>
+        <p>Внутри виртуальной машины выполните:</p>
+        <pre><code>
+        $ nvim network.sh
+        </code></pre>
+        <p>Добавьте в него следующие строки:</p>
+        <pre><code>
+        #!/bin/bash
+        
+        # Replace with the actual network interface name of the guest
+        # (use "ip addr" to list the interfaces)
+        GUEST_DEV=enp0s5
+        sudo ip addr add 192.168.10.2/24 dev "${GUEST_DEV}"
+        sudo ip link set "${GUEST_DEV}" up
+        sudo ip route add default via 192.168.10.1
+        # "8.8.8.8" is chosen arbitrarily as a default, please replace with your local (or preferred global)
+        # DNS provider, which should be visible in `/etc/resolv.conf` on the host.
+        echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+        </code></pre>
+        <p>Замените enp0s5 на имя своего устройства</p>
+        <p>Затем выполните:</p>
+        <pre><code>
+        $ sudo chmod +x network.sh
+        $ sudo ./network.sh
+        </code></pre>
+        <p>Подключитесь по SSH</p>
+        ssh <username>@192.168.10.2
+        <p>Остановка виртуальной машины</p>
+        <p>В новой сессии Termux выполните:</p>
+        <pre><code>
+        # su
+        # cd /apex/com.android.virt/bin
+        # ./crosvm stop /data/data/com.termux/files/home/kvm/crosvm.sock
+        </code></pre>
+        <h3>GUI с Xserver XSDL</h3>
+        <p>В гостевой системе</p>
+        <p>Внутри виртуальной машины выполните:</p>
+        <pre><code>
+        $ sudo apt install tightvncserver, xfce4, xfce4-terminal, xfce4-goodies
+        </code></pre>
+        <p>В новой сессии Termux выполните:</p>
+        <pre><code>
+        # ssh -L 5901:127.0.0.1:5901 -C -N -l <username> 192.168.10.2
+        </code></pre>
+        <p>Установите Xserver XSDL app для android</p>
+        <p>выполните команды со скрина приложения</p>
+        <h3>Общие папки</h3>
+        <p>В Termux выполните:</p>
+        <pre><code>
+        # mkdir host_shared_dir
+        # su
+        # cd /apex/com.android.virt/bin
+        # ./crosvm run --disable-sandbox --shared-dir "/data/data/com.termux/files/home/host_shared_dir:my_shared_tag:type=fs" -p 'init=/sbin/init' --rwroot /data/data/com.termux/files/home/kvm/debian.img /data/data/com.termux/files/home/kvm/Image
+        </code></pre>
+        <p>В гостевой системе</p>
+        <p>Внутри виртуальной машины выполните:</p>
+        <pre><code>
+        $ sudo su
+        $ mkdir /tmp/guest_shared_dir
+        $ mount -t virtiofs my_shared_tag /tmp/guest_shared_dir
+        </code></pre>
+        <p>Используйте /tmp/guest_shared_dir и /data/data/com.termux/files/home/host_shared_dir</p>
+        <h3>Решение проблем</h3>
+        <p>Ошибка: ping 8.8.8.8. Network is unreachable</p>
+        <p>Решение: возможно проблема в провах. sudo chmod +x gvforwarder</p>
+        <p>Ошибка: ERRO[0000] gvproxy exiting: cannot listen: listen unix /data/data/com.termux/files/home/kvm/network.sock: bind: address already in use</p>
+        <p>Решение: Удалить файл network.sock</p>
+        <p>Ошибка: ERRO[0000] gvproxy exiting: cannot add network services: listen tcp 127.0.0.1:2222: bind: address already in use</p>
+        <p>Решение: Перезагрузите устройство</p>
+        <p>Ошибка: ERRO[0000] socket: address family not supported by protocol</p>
+        <p>Решение: CONFIG_VSOCKETS=y</p>
+        <p>Ошибка: ERRO[0000] dhcp not found</p>
+        <p>Решение: Создать дистрибутив с dhclient</p>
+        <h3>Дополнительные возможности</h3>
+        Вы можете запустить несколько виртуальных машин, если разместите бинарный файл Crosvm в другую директорию с образом и ядром.
+        <h3>Заключение</h3>
+        <p>В итоге, у меня есть ARM64 Linux в виртуальной машине на телефоне. Вы можете ознакомиться с моей инструкцией на моем GitHub</p>
+
+  </main>
+<body>
+</html>
