@@ -20,7 +20,7 @@ a {
 
 .h1logo {color: black;
 	padding:10px;
-    margin-left: 200px;
+    margin-left: 75px;
 }
 
 nav ul {
@@ -38,30 +38,27 @@ nav a {
 
 nav {
     padding: 25;
-	margin-right:200px;
+	margin-right:75px;
 }
 
 .conteiner {
-	display:flex;
-    flex-direction: column;
-    justify-content: center;
 	min-height:calc(100vh - 65px);
 }
 
 .listofcontent {
 	background:white;
-    height: 700px;
-	margin-left: 200px;
-    margin-right:200px;
+    margin-left: 75px;
+    margin-right:75px;
     margin-top: 10;
     margin-bottom: 10;
     padding:25px;
+    height: 700px;
 }
 
 .content {
 	background:white;
-	margin-left: 200px;
-    margin-right:200px;
+    margin-left: 75px;
+    margin-right:75px;
     margin-top: 10;
     margin-bottom: 10;
     padding:25px;
@@ -88,4 +85,58 @@ pre {
     padding: 1em 1.5em;
     display: block;
     word-wrap: break-word;
+}
+
+
+@media (min-width:950px) {
+
+.h1logo {color: black;
+	padding:10px;
+    margin-left: 200px;
+}
+
+nav ul {
+	list-style:none;
+}
+
+nav li {
+	display: inline-block;
+}
+
+nav a {
+    color: black;
+	display:block;	
+}
+
+nav {
+    padding: 25;
+	margin-right:200px;
+}
+    
+.conteiner {
+	display:flex;
+    flex-direction: column;
+    justify-content: center;
+	min-height:calc(100vh - 65px);
+}
+
+.listofcontent {
+	background:white;
+    height: 700px;
+	margin-left: 200px;
+    margin-right:200px;
+    margin-top: 10;
+    margin-bottom: 10;
+    padding:25px;
+}
+
+.content {
+	background:white;
+	margin-left: 200px;
+    margin-right:200px;
+    margin-top: 10;
+    margin-bottom: 10;
+    padding:25px;
+}
+
 }
