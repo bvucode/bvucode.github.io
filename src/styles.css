@@ -14,9 +14,13 @@ header {
 	justify-content:space-between;
 }
 
+a {
+	text-decoration:none;
+}
+
 .h1logo {color: black;
 	padding:10px;
-    margin-left: 270px;
+    margin-left: 200px;
 }
 
 nav ul {
@@ -34,18 +38,21 @@ nav a {
 
 nav {
     padding: 25;
-	margin-right:240px;
+	margin-right:200px;
 }
 
 .conteiner {
 	display:flex;
+    flex-direction: column;
+    justify-content: center;
 	min-height:calc(100vh - 65px);
 }
 
 .listofcontent {
 	background:white;
-	width: 950;
-	margin-left: 270px;
+    height: 700px;
+	margin-left: 200px;
+    margin-right:200px;
     margin-top: 10;
     margin-bottom: 10;
     padding:25px;
@@ -53,8 +60,8 @@ nav {
 
 .content {
 	background:white;
-	width: 950px;
-	margin-left: 270px;
+	margin-left: 200px;
+    margin-right:200px;
     margin-top: 10;
     margin-bottom: 10;
     padding:25px;
