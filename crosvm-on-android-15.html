@@ -60,7 +60,7 @@
         $ make menuconfig
         $ CROSS_COMPILE=aarch64-linux-gnu- make ARCH=arm64 -j 8
         </code></pre>
-        <p>Кросс-компиляция gVisor Proxy</p>
+        <h3>Кросс-компиляция gVisor Proxy</h3>
         <p>Сначала кросс-компилируем gVisor Proxy для aarch64:</p>
         <pre><code>
         git clone https://github.com/containers/gvisor-tap-vsock gvisor-tap-vsock-arm64
@@ -94,9 +94,9 @@
         <p>Создайте пользователя и завершите настройку:</p>
         <pre><code>
         $ sudo chroot ./rootfs /bin/bash
-        $ useradd -m -g sudo <usermane>
-        $ passwd <username>
-        $ chsh -s /bin/bash <username>
+        $ useradd -m -g sudo usermane
+        $ passwd username
+        $ chsh -s /bin/bash username
         $ exit
         </code></pre>
         <p>Скопируйте gVisor Proxy в rootfs:</p>
@@ -214,7 +214,7 @@
         $ sudo ./network.sh
         </code></pre>
         <p>Подключитесь по SSH</p>
-        ssh <username>@192.168.10.2
+        ssh username@192.168.10.2
         <p>Остановка виртуальной машины</p>
         <p>В новой сессии Termux выполните:</p>
         <pre><code>
@@ -230,7 +230,7 @@
         </code></pre>
         <p>В новой сессии Termux выполните:</p>
         <pre><code>
-        # ssh -L 5901:127.0.0.1:5901 -C -N -l <username> 192.168.10.2
+        # ssh -L 5901:127.0.0.1:5901 -C -N -l username 192.168.10.2
         </code></pre>
         <p>Установите Xserver XSDL app для android</p>
         <p>выполните команды со скрина приложения</p>
@@ -252,7 +252,7 @@
         <p>Используйте /tmp/guest_shared_dir и /data/data/com.termux/files/home/host_shared_dir</p>
         <h3>Решение проблем</h3>
         <p>Ошибка: ping 8.8.8.8. Network is unreachable</p>
-        <p>Решение: возможно проблема в провах. sudo chmod +x gvforwarder</p>
+        <p>Решение: sudo chmod +x gvforwarder</p>
         <p>Ошибка: ERRO[0000] gvproxy exiting: cannot listen: listen unix /data/data/com.termux/files/home/kvm/network.sock: bind: address already in use</p>
         <p>Решение: Удалить файл network.sock</p>
         <p>Ошибка: ERRO[0000] gvproxy exiting: cannot add network services: listen tcp 127.0.0.1:2222: bind: address already in use</p>
@@ -269,9 +269,7 @@
     </div>
   </div>
   <div id="footer">
-   <footer>
     <p>Copyright &copy; 2025 All right reserved.</p>
-  </footer>
   </div>
 <body>
 </html>
