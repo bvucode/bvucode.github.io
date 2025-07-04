@@ -249,11 +249,15 @@
         $ mkdir /tmp/guest_shared_dir
         $ mount -t virtiofs my_shared_tag /tmp/guest_shared_dir
         </code></pre>
-        <p>Используйте /tmp/guest_shared_dir и /data/data/com.termux/files/home/host_shared_dir</p>
+        <p>Используйте<br />
+        /tmp/guest_shared_dir<br />
+        и<br />
+        /data/data/com.termux/files/home/host_shared_dir</p>
         <h3>Решение проблем</h3>
         <p>Ошибка: ping 8.8.8.8. Network is unreachable</p>
         <p>Решение: sudo chmod +x gvforwarder</p>
-        <p>Ошибка: ERRO[0000] gvproxy exiting: cannot listen: listen unix /data/data/com.termux/files/home/kvm/network.sock: bind: address already in use</p>
+        <p>Ошибка: ERRO[0000] gvproxy exiting: cannot listen: listen unix /data/data/com.termux/files/home/kvm<br />
+          /network.sock: bind: address already in use</p>
         <p>Решение: Удалить файл network.sock</p>
         <p>Ошибка: ERRO[0000] gvproxy exiting: cannot add network services: listen tcp 127.0.0.1:2222: bind: address already in use</p>
         <p>Решение: Перезагрузите устройство</p>
