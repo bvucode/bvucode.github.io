@@ -101,7 +101,7 @@
         </code></pre>
         <p>Скопируйте gVisor Proxy в rootfs:</p>
         <pre><code>
-        $ sudo mkdir -p ./rootfs/gvisor-tap-vsock
+        $ sudo mkdir -p ./rootfs/gvisor-tap-vsock/bin
         $ sudo cp -r ./gvisor-tap-vsock-arm64/bin/* ./rootfs/gvisor-tap-vsock/bin
         $ sudo umount ./rootfs
         </code></pre>
@@ -264,7 +264,7 @@
         <h3>Дополнительные возможности</h3>
         Вы можете запустить несколько виртуальных машин, если разместите бинарный файл Crosvm в другую директорию с образом и ядром.
         <h3>Заключение</h3>
-        <p>В итоге, у меня есть ARM64 Linux в виртуальной машине на телефоне. Вы можете ознакомиться с моей инструкцией на моем GitHub</p>
+        <p>В итоге, у меня есть ARM64 Linux в виртуальной машине на телефоне. Вы можете ознакомиться с моей инструкцией на моем <a href = "https://github.com/bvucode/crosvm-on-android">GitHub</a>.
       </div>
     </div>
   </div>
