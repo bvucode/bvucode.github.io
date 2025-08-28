@@ -1,4 +1,4 @@
-<! DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <link rel="stylesheet" href ="src/styles.css" />
@@ -7,8 +7,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" /> 
   <meta charset = "utf-8"/>
   <meta name = "viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name = "author" content = "Bulat Valiakhmetov" />
-  <title>Run linux on android without AVF support</title>
+  <meta name="description" content="Run Linux on Android without AVF support Запуск Linux на устройствах Android без поддержки AVF">
+  <meta name="keywords" content="android virtual machine crosvm AVF android virtualzation framework">
+  <meta name="robots" content="index, follow"> <!-- Инструкции для поисковых роботов -->
+
+  <title>Запуск Linux на устройствах Android без поддержки AVF</title>
 </head>
 <body>
   <header>
@@ -134,7 +137,7 @@
         # the main route table needs to be added
         ip rule add from all lookup main pref 1
         </code></pre>
-        <p>На Android настройка сети из документации Crosvm не работает. Проблема в том, что Android не добавляет основную таблицу маршрута в свою файловую систему. Чтобы исправить эту проблему, необходимо добавить основной таблицу маршрута:</p>
+        <p>На Android настройка сети из документации Crosvm не работает. Проблема в том, что Android не добавляет основную таблицу маршрута в свою файловую систему. Чтобы исправить эту проблему, необходимо добавить основную таблицу маршрута:</p>
         <pre><code>
         ip rule add from all lookup main pref 1
         </code></pre>
@@ -222,16 +225,29 @@
         # cd /apex/com.android.virt/bin
         # ./crosvm stop /data/data/com.termux/files/home/kvm/crosvm.sock
         </code></pre>
-        <h3>GUI с Xserver XSDL</h3>
+        <h3>GUI с VNC, Xserver XSDL</h3>
         <p>В гостевой системе</p>
         <p>Внутри виртуальной машины выполните:</p>
         <pre><code>
-        $ sudo apt install tightvncserver, xfce4, xfce4-terminal, xfce4-goodies
+        $ sudo apt install tightvncserver xfce4 xfce4-terminal xfce4-goodies
         </code></pre>
+        <p>Для VNC</p>
         <p>В новой сессии Termux выполните:</p>
         <pre><code>
         # ssh -L 5901:127.0.0.1:5901 -C -N -l username 192.168.10.2
         </code></pre>
+        <p>В гостевой системе</p>
+        <pre><code>
+        $ vncserver
+        </code></pre>
+        <p>Настройте vncserver</p>
+        <p>Установите VNC клиент</p>
+        <pre><code>
+        localhost
+        5901
+        password
+        </code></pre>
+        <p>Для Xserver XSDL</p>
         <p>Установите Xserver XSDL app для android</p>
         <p>выполните команды со скрина приложения</p>
         <h3>Общие папки</h3>
@@ -252,13 +268,12 @@
         <p>Используйте<br />
         /tmp/guest_shared_dir<br />
         и<br />
-        /data/data/com.termux/files/home<br />
-	/host_shared_dir</p>
+        /data/data/com.termux/files/home/host_shared_dir</p>
         <h3>Решение проблем</h3>
         <p>Ошибка: ping 8.8.8.8. Network is unreachable</p>
         <p>Решение: sudo chmod +x gvforwarder</p>
         <p>Ошибка: ERRO[0000] gvproxy exiting: cannot listen: listen unix /data/data/com.termux/files/home/kvm<br />
-        /network.sock: bind: address already in use</p>
+          /network.sock: bind: address already in use</p>
         <p>Решение: Удалить файл network.sock</p>
         <p>Ошибка: ERRO[0000] gvproxy exiting: cannot add network services: listen tcp 127.0.0.1:2222: bind: address already in use</p>
         <p>Решение: Перезагрузите устройство</p>
