@@ -1,0 +1,209 @@
+<html>
+<head>
+  <link rel="stylesheet" href ="src/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" /> 
+  <meta charset = "utf-8"/>
+  <meta name = "viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="KasmVNC on Debian on Android in Crosvm">
+  <meta name="keywords" content="kasmvnc debian android crosvm">
+  <meta name="robots" content="index, follow"> <!-- Инструкции для поисковых роботов -->
+  <title>Установка KasmVNC в Debian на Android в Crosvm</title>
+</head>
+<body>
+  <header>
+    <a href = "https://bvucode.github.io"><h1 class = "h1logo">BV</h1></a>
+    <nav>
+	<ul>
+	    <li><a href = "https://bvucode.github.io">Home</a></li>
+	</ul>
+    </nav>
+  </header>
+  <div class="conteiner">
+    <div class="content">
+      <h2>Установка KasmVNC в Debian на Android в Crosvm</h2>
+      <p>В этой статье описывается, как установить и настроить KasmVNC на Debian в Android через Crosvm.
+         Это единственный надежный способ заставить работать 3D-графику с флагом для поддержки Virtio-GPU и virglrenderer при запуске Crosvm
+         для non-Pixel телефоне без поддержки Android Virtualization Framework. В телефонах Pixel в Android 16 GPU поддерживается в Linux-терминал.
+         KasmVNC - это современный сервере VNC, который обеспечивает плавный, безопасный удаленный рабочий стол.
+         Улучшенная версия на базе TigerVNC, разработанная для облачных и современных веб-технологий. Он обеспечивает лучшую
+         производительность, безопасность и пользовательский опыт.</p>
+      <h3>Подготовка</h3>
+          <p>Обновление системы</p>
+          <pre><code>
+             sudo apt update
+             sudo apt upgrade
+          </code></pre>
+          <p>Необходимо настроить среду рабочего стола для запуска и установить необходимые зависимости. Вот шаги по настройке среды рабочего стола Xfce4.</p>
+          <pre><code>
+             sudo apt install xfce4 xfce4-terminal xfce4-goodies dbus-x11 wget
+          </code></pre>
+          <p>Скачать и установить KasmVNC</p>
+          <pre><code>
+             wget https://github.com/kasmtech/KasmVNC/releases/download/v1.3.4/kasmvncserver_bookworm_1.3.4_arm64.deb
+             apt-get install ./kasmvncserver_bookworm_1.3.4_arm64.deb
+          </code></pre>
+          <p>Если во время процесса установки существует проблема зависимости, вы можете запустить следующую команду для решения.</p>
+          <pre><code>
+             sudo apt --fix-broken install
+          </code></pre>
+          <p>Инициализируйте конфигурацию KasmVNC</p>
+          <p>Запустите следующую команду для инициализации конфигурации KasmVNC</p>
+          <pre><code>
+             kasmvncserver
+          </code></pre>
+          <p>Когда вы впервые запустите эту команду, вы увидите следующую подсказку</p>
+          <pre><code>
+             Creating default config /root/.vnc/kasmvnc.yaml
+             xauth:
+             file /root/.Xauthority does not exist
+             In order to control your desktop, you need a KasmVNC user with write
+             permissions. Select what action to take:
+             [1] Create a new user with write access
+             [2] Start KasmVNC without a user with write access
+          </code></pre>
+          <p>Выберите опцию [1], чтобы создать нового пользователя с разрешениями записи. Это гарантирует, что у вас достаточно
+          разрешений для управления рабочим столом. После создания пользователя вы увидите выход, аналогичный следующему.</p>
+          <pre><code>
+             New 'US706980102097:1 (root)' desktop is US706980102097:1
+             Users configured:
+             root (can use keyboard and mouse)
+             Log file is /root/.vnc/US706980102097:1.log
+             Creating default startup script /root/.vnc/xstartup
+             Starting applications specified in /root/.vnc/xstartup
+             Paste this url in your browser:
+             https://127.0.1.1:8444
+          </code></pre>
+          <p>Этот выход содержит несколько важных частей информации</p>
+          <ol>
+              <li>KasmVNC успешно создала новую сессию рабочего стола</li>
+              <li>Расположение файла журнала:/root/.vnc/US706980102097:1.log</li>
+              <li>Расположение скрипта по умолчанию:/root/.vnc/xstartup</li>
+              <li>Посетите URL KasmVNC:https://127.0.1.1:8444</li>
+          </ol>
+          <p>Если вы не можете получить доступ https://127.0.1.1:8444 можно использовать адрес указаный в гостевой ос https://192.168.10.2:8444</p>
+          <p>Для начала новой сессии KasmVNC можно использовать следующую команду</p>
+          <pre><code>
+             vncserver
+          </code></pre>
+          <p>Управление сессиями KasmVNC</p>
+          <p>Для просмотра текущей сессии VNC можно использовать следующую команду</p>
+          <pre><code>
+             vncserver -list
+          </code></pre>
+          <p>Если вы хотите остановить определенный сеанс VNC, вы можете использовать следующую команду</p>
+          <pre><code>
+             vncserver -kill :1
+          </code></pre>
+          <p>Здесь :1 Это номер сеанса</p>
+          <p>Настройка KasmVNC при запуске</p>
+          <p>Если вы хотите, чтобы KasmVNC работал автоматически при запуске системы, вы можете создать системную службу
+          /etc/systemd/system/kasmvnc.service:: ::</p>
+          <pre><code>
+             sudo nvim /etc/systemd/system/kasmvnc.service
+          </code></pre>
+          <p>Добавить следующее</p>
+          <pre><code>
+             [Unit]
+             Description=KasmVNC Server
+             After=network.target
+             [Service]
+             Type=forking
+             User=your_username
+             ExecStart=/usr/bin/vncserver
+             ExecStop=/usr/bin/vncserver -kill :1
+             [Install]
+             WantedBy=multi-user.target
+          </code></pre>
+          <p>your_username Замените свое настоящее имя пользователя</p>
+          <p>Затем включить и запустить услугу</p>
+          <pre><code>
+             sudo systemctl enable kasmvnc.service
+             sudo systemctl start kasmvnc.service
+          </code></pre>
+          <p>KasmVNC теперь будет работать автоматически, когда система запускается</p>
+          <p>Настройка SSL сертификата</p>
+          <p>Если вы столкнулись с ошибкой "/etc/ssl/private/ssl-cert-snakeoil.key: сертификата не существует или не является файлом", это означает, что
+          KasmVNC не может найти сертификат SSL по умолчанию. Вы можете создать самоподписанный сертификат, выполнив следующие действия</p>
+          <p>Установите пакет ssl-cert</p>
+          <pre><code>
+             sudo apt install ssl-cert
+          </code></pre>
+          <p>Создайте самоподписанный сертификат</p>
+          <pre><code>
+             sudo make-ssl-cert generate-default-snakeoil --force-overwrite
+          </code></pre>
+          <p>Убедитесь, что KasmVNC имеет доступ к этим файлам</p>
+          <pre><code>
+             sudo chmod 644 /etc/ssl/certs/ssl-cert-snakeoil.pem
+             sudo chmod 640 /etc/ssl/private/ssl-cert-snakeoil.key
+             sudo chown root:ssl-cert /etc/ssl/private/ssl-cert-snakeoil.key
+          </code></pre>
+          <p>Добавьте пользователя в группу ssl-cert</p>
+          <pre><code>
+             sudo usermod -a -G ssl-cert $USER
+          </code></pre>
+          <p>Для групповых изменений, чтобы вступили в силу и запустить</p>
+          <pre><code>
+             newgrp ssl-cert
+          </code></pre>
+          <p>Перезапустить сервис KasmVNC</p>
+          <pre><code>
+             vncserver -kill :1
+             vncserver
+          </code></pre>
+          <p>Эти шаги должны решить проблему SSL-сертификатов.
+          Теперь вы можете получить доступ к KasmVNC через свой веб-браузер</p>
+          <p>Введите в браузере:https://your_server_ip:8444
+          <p>Введите пароль VNC</p>
+          <p>Редактируте файл скрипта запуска VNC, если только черный экран</p>
+          <pre><code>
+             nvim ~/.vnc/xstartup
+          </code></pre>
+          <p>Заменить содержание документа следующим</p>
+          <pre><code>
+             #!/bin/bash
+             unset SESSION_MANAGER
+             unset DBUS_SESSION_BUS_ADDRESS
+             export XKL_XMODMAP_DISABLE=1
+             export XDG_SESSION_TYPE=x11
+             export GDK_BACKEND=x11
+             xfce4-session &
+          </code></pre>
+          <p>Убедитесь, что скрипт запуска имеет разрешения на выполнение</p>
+          <pre><code>
+             chmod +x ~/.vnc/xstartup
+          </code></pre>
+          <p>Перезапуск VNC</p>
+          <pre><code>
+             vncserver -kill :1
+             vncserver
+          </code></pre>
+          <p>Если у вас возникли проблемы с запуском среды рабочего стола, вы можете просмотреть файл журнала VNC (обычно расположенный
+          по адресу ~/.vnc/ для получения дополнительной информации.</p>
+          <p>Если у вас все еще возникли проблемы с использованием , попробуйте следующие шаги.
+          Убедитесь, что переменная среды DISPLAY установлена правильно</p>
+          <pre><code>
+             echo $DISPLAY
+          </code></pre>
+          <p>Если выход неверный, установите его</p>
+          <pre><code>
+             export DISPLAY=:1
+          </code></pre>
+          <p>Проверьте, работает ли сервер VNC</p>
+          <pre><code>
+             vncserver -list
+             vncserver
+          </code></pre>
+          <p>С помощью вышеуказанных шагов вы успешно установили и настроили KasmVNC на Debian.
+          Если вы столкнулись с какими-либо проблемами во время установки или использования, вы можете ознакомиться с официальной
+          документацией KasmVNC или обратиться за помощью в его репозитории GitHub.
+       </p>
+      </div>
+  </div>
+  <div id="footer">
+    <p>Copyright &copy; 2025 All right reserved.</p>
+  </div>
+</body>
+</html>
