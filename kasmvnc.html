@@ -25,7 +25,7 @@
       <h2>Установка KasmVNC в Debian на Android в Crosvm</h2>
       <p>В этой статье описывается, как установить и настроить KasmVNC на Debian в Android через Crosvm.
          Это единственный надежный способ заставить работать 3D-графику с флагом для поддержки Virtio-GPU и virglrenderer при запуске Crosvm
-         для non-Pixel телефоне без поддержки Android Virtualization Framework. В телефонах Pixel в Android 16 GPU поддерживается в Linux-терминал.
+         для non-Pixel телефона без поддержки Android Virtualization Framework. В телефонах Pixel в Android 16 GPU поддерживается в Linux-терминал.
          KasmVNC - это современный сервере VNC, который обеспечивает плавный, безопасный удаленный рабочий стол.
          Улучшенная версия на базе TigerVNC, разработанная для облачных и современных веб-технологий. Он обеспечивает лучшую
          производительность, безопасность и пользовательский опыт.</p>
@@ -191,9 +191,9 @@
           <pre><code>
              export DISPLAY=:1
           </code></pre>
-          <p>Проверьте, работает ли сервер VNC</p>
+          <p>Перезапуск VNC</p>
           <pre><code>
-             vncserver -list
+             vncserver -kill :1
              vncserver
           </code></pre>
           <p>С помощью вышеуказанных шагов вы успешно установили и настроили KasmVNC на Debian.
