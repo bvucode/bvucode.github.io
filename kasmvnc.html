@@ -26,19 +26,20 @@
       <p>В этой статье подробно описывается процесс установки и настройки KasmVNC на операционной системе Debian, запущенной в среде Crosvm на устройстве Android.
          Описываемый метод является единственным надежным способом активации 3D-графики на телефонах, отличных от Google Pixel, которые не поддерживают Android Virtualization Framework (AVF).
 		 Для достижения аппаратного ускорения графики при запуске Crosvm используются специальные флаги поддержки Virtio-GPU и virglrenderer.
-         Примечание: На телефонах Google Pixel с Android 16 ожидается нативная поддержка аппаратного ускорения графики в Linux-терминале.
+         Примечание: На телефонах Google Pixel с Android 16 нативная поддержка аппаратного ускорения графики в Linux-терминале.
          KasmVNC — это современный сервер VNC, обеспечивающий плавный и безопасный удаленный рабочий стол. Он основан на улучшенной версии TigerVNC и оптимизирован для облачных и современных веб-технологий,
 		 предлагая повышенную производительность, безопасность и удобство использования.</p>
-      <h3>Подготовка</h3>
-          <p>Обновление системы</p>
+       <h3>Обновление системы</h3>
           <pre><code>
              sudo apt update
              sudo apt upgrade
           </code></pre>
-          <p>Необходимо настроить среду рабочего стола для запуска и установить необходимые зависимости. Вот шаги по настройке среды рабочего стола Xfce4.</p>
+		<h3>Установка среды рабочего стола и зависимостей</h3>
+          <p>Необходимо настроить среду рабочего стола для запуска и установить необходимые зависимости. Мы будем использовать легкую среду рабочего стола Xfce4.</p>
           <pre><code>
              sudo apt install xfce4 xfce4-terminal xfce4-goodies dbus-x11 wget
           </code></pre>
+		<h3>Загрузка и установка KasmVNC</h3>
           <p>Скачать и установить KasmVNC</p>
           <pre><code>
              wget https://github.com/kasmtech/KasmVNC/releases/download/v1.3.4/kasmvncserver_bookworm_1.3.4_arm64.deb
@@ -48,7 +49,7 @@
           <pre><code>
              sudo apt --fix-broken install
           </code></pre>
-          <p>Инициализируйте конфигурацию KasmVNC</p>
+        <h3>Инициализируйте конфигурацию KasmVNC</h3>
           <p>Запустите следующую команду для инициализации конфигурации KasmVNC</p>
           <pre><code>
              kasmvncserver
@@ -63,8 +64,8 @@
              [1] Create a new user with write access
              [2] Start KasmVNC without a user with write access
           </code></pre>
-          <p>Выберите опцию [1], чтобы создать нового пользователя с разрешениями записи. Это гарантирует, что у вас достаточно
-          разрешений для управления рабочим столом. После создания пользователя вы увидите выход, аналогичный следующему.</p>
+          <p>Выберите опцию [1], чтобы создать нового пользователя с разрешениями на запись. Это обеспечит необходимые права для управления рабочим столом. Вам будет предложено ввести имя пользователя и пароль.
+			 После создания пользователя и запуска сервера вы увидите информацию о сессии:</p>
           <pre><code>
              New 'US706980102097:1 (root)' desktop is US706980102097:1
              Users configured:
@@ -79,8 +80,8 @@
           <ol>
               <li>KasmVNC успешно создала новую сессию рабочего стола</li>
               <li>Расположение файла журнала:/root/.vnc/US706980102097:1.log</li>
-              <li>Расположение скрипта по умолчанию:/root/.vnc/xstartup</li>
-              <li>Посетите URL KasmVNC:https://127.0.1.1:8444</li>
+              <li>Расположение скрипта запуска по умолчанию:/root/.vnc/xstartup</li>
+              <li>URL для доступа в браузере: https://127.0.1.1:8444</li>
           </ol>
           <p>Если вы не можете получить доступ https://127.0.1.1:8444 можно использовать адрес указаный в гостевой ос https://192.168.10.2:8444</p>
           <p>Для начала новой сессии KasmVNC можно использовать следующую команду</p>
@@ -96,68 +97,9 @@
           <pre><code>
              vncserver -kill :1
           </code></pre>
-          <p>Здесь :1 Это номер сеанса</p>
-          <p>Настройка KasmVNC при запуске</p>
-          <p>Если вы хотите, чтобы KasmVNC работал автоматически при запуске системы, вы можете создать системную службу
-          /etc/systemd/system/kasmvnc.service:: ::</p>
-          <pre><code>
-             sudo nvim /etc/systemd/system/kasmvnc.service
-          </code></pre>
-          <p>Добавить следующее</p>
-          <pre><code>
-             [Unit]
-             Description=KasmVNC Server
-             After=network.target
-             [Service]
-             Type=forking
-             User=your_username
-             ExecStart=/usr/bin/vncserver
-             ExecStop=/usr/bin/vncserver -kill :1
-             [Install]
-             WantedBy=multi-user.target
-          </code></pre>
-          <p>your_username Замените свое настоящее имя пользователя</p>
-          <p>Затем включить и запустить услугу</p>
-          <pre><code>
-             sudo systemctl enable kasmvnc.service
-             sudo systemctl start kasmvnc.service
-          </code></pre>
-          <p>KasmVNC теперь будет работать автоматически, когда система запускается</p>
-          <p>Настройка SSL сертификата</p>
-          <p>Если вы столкнулись с ошибкой "/etc/ssl/private/ssl-cert-snakeoil.key: сертификата не существует или не является файлом", это означает, что
-          KasmVNC не может найти сертификат SSL по умолчанию. Вы можете создать самоподписанный сертификат, выполнив следующие действия</p>
-          <p>Установите пакет ssl-cert</p>
-          <pre><code>
-             sudo apt install ssl-cert
-          </code></pre>
-          <p>Создайте самоподписанный сертификат</p>
-          <pre><code>
-             sudo make-ssl-cert generate-default-snakeoil --force-overwrite
-          </code></pre>
-          <p>Убедитесь, что KasmVNC имеет доступ к этим файлам</p>
-          <pre><code>
-             sudo chmod 644 /etc/ssl/certs/ssl-cert-snakeoil.pem
-             sudo chmod 640 /etc/ssl/private/ssl-cert-snakeoil.key
-             sudo chown root:ssl-cert /etc/ssl/private/ssl-cert-snakeoil.key
-          </code></pre>
-          <p>Добавьте пользователя в группу ssl-cert</p>
-          <pre><code>
-             sudo usermod -a -G ssl-cert $USER
-          </code></pre>
-          <p>Для групповых изменений, чтобы вступили в силу и запустить</p>
-          <pre><code>
-             newgrp ssl-cert
-          </code></pre>
-          <p>Перезапустить сервис KasmVNC</p>
-          <pre><code>
-             vncserver -kill :1
-             vncserver
-          </code></pre>
-          <p>Эти шаги должны решить проблему SSL-сертификатов.
-          Теперь вы можете получить доступ к KasmVNC через свой веб-браузер</p>
-          <p>Введите в браузере: https://your_server_ip:8444</p>
-          <p>Введите пароль VNC</p>
-          <p>Редактируте файл скрипта запуска VNC, если только черный экран</p>
+          <p>Здесь :1 — это номер сеанса, который вы можете увидеть в выводе команды -list.</p>
+		  <p>Если вы успешно подключились к веб-интерфейсу, но видите только черный экран, это означает, что среда рабочего стола Xfce4 не была запущена корректно.</p>
+		  <p>Редактируте файл скрипта запуска VNC</p>
           <pre><code>
              nvim ~/.vnc/xstartup
           </code></pre>
@@ -180,10 +122,73 @@
              vncserver -kill :1
              vncserver
           </code></pre>
+		  <p>Подключение осуществляется через веб-браузер на вашем Android-устройстве по адресу: https://127.0.1.1:8444.
+			 Если вы не можете получить доступ по адресу https://127.0.1.1:8444 (что часто бывает при работе через Crosvm),
+			 используйте IP-адрес, назначенный гостевой ОС Debian (например, https://192.168.10.2:8444).
+		     Вы можете узнать этот адрес с помощью команды ip a .
+		  </p>
+        <h3>Автоматический запуск KasmVNC при загрузке (systemd)</h3>
+          <p>Если вы хотите, чтобы KasmVNC запускался автоматически при старте системы Debian, можно создать системную службу systemd.</p>
+          <pre><code>
+             sudo nvim /etc/systemd/system/kasmvnc.service
+          </code></pre>
+          <p>Добавьте следующее содержимое:Важно: Замените your_username на ваше реальное имя пользователя (например, root).</p>
+          <pre><code>
+             [Unit]
+             Description=KasmVNC Server
+             After=network.target
+             [Service]
+             Type=forking
+             User=your_username
+             ExecStart=/usr/bin/vncserver
+             ExecStop=/usr/bin/vncserver -kill :1
+             [Install]
+             WantedBy=multi-user.target
+          </code></pre>
+          <p>Затем включить и запустить услугу</p>
+          <pre><code>
+             sudo systemctl enable kasmvnc.service
+             sudo systemctl start kasmvnc.service
+          </code></pre>
+          <p>KasmVNC теперь будет работать автоматически, когда система запускается</p>
+		<h3>Настройка SSL-сертификата (Устранение ошибки)</h3>
+          <p>Если при попытке подключения вы столкнулись с ошибкой /etc/ssl/private/ssl-cert-snakeoil.key: сертификата не существует или
+			 не является файлом, это означает, что KasmVNC не может найти сертификат SSL по умолчанию. Вы можете создать самоподписанный сертификат,
+			 выполнив следующие действия:</p>
+          <p>Установите пакет ssl-cert</p>
+          <pre><code>
+             sudo apt install ssl-cert
+          </code></pre>
+          <p>Создайте самоподписанный сертификат</p>
+          <pre><code>
+             sudo make-ssl-cert generate-default-snakeoil --force-overwrite
+          </code></pre>
+          <p>Убедитесь, что KasmVNC имеет доступ к этим файлам</p>
+          <pre><code>
+             sudo chmod 644 /etc/ssl/certs/ssl-cert-snakeoil.pem
+             sudo chmod 640 /etc/ssl/private/ssl-cert-snakeoil.key
+             sudo chown root:ssl-cert /etc/ssl/private/ssl-cert-snakeoil.key
+          </code></pre>
+          <p>Добавьте пользователя в группу ssl-cert</p>
+          <pre><code>
+             sudo usermod -a -G ssl-cert $USER
+          </code></pre>
+          <p>Чтобы изменения группы вступили в силу, выполните:</p>
+          <pre><code>
+             newgrp ssl-cert
+          </code></pre>
+          <p>Перезапустить сервис KasmVNC</p>
+          <pre><code>
+             vncserver -kill :1
+             vncserver
+          </code></pre>
+          <p>Эти шаги должны решить проблему SSL-сертификатов. Теперь вы можете получить доступ к KasmVNC через свой веб-браузер.
+			 Введите в браузере: https://your_server_ip:8444 (например, https://192.168.10.2:8444).</p>
+          <p>Введите пароль VNC</p>
+		<h3>Дополнительные советы по устранению проблем</h3>
           <p>Если у вас возникли проблемы с запуском среды рабочего стола, вы можете просмотреть файл журнала VNC (обычно расположенный
-          по адресу ~/.vnc/ для получения дополнительной информации.</p>
-          <p>Если у вас все еще возникли проблемы с использованием , попробуйте следующие шаги.
-          Убедитесь, что переменная среды DISPLAY установлена правильно</p>
+          по адресу ~/.vnc/*.log для получения дополнительной информации.</p>
+          <p>Убедитесь, что переменная среды DISPLAY установлена правильно</p>
           <pre><code>
              echo $DISPLAY
           </code></pre>
