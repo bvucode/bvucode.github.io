@@ -18,6 +18,11 @@ a {
 	text-decoration:none;
 }
 
+p {
+    margin-bottom: 2em; /* Устанавливаем отступ в 2 раза больше стандартного размера шрифта */
+    /* Вы можете использовать другие единицы измерения, например, px: margin-bottom: 30px; */
+  }
+
 .h1logo {
     color: black;
 	padding:10px;
