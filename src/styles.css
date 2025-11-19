@@ -85,6 +85,7 @@ nav {
     border-radius: 8px;           /* Скругленные углы */
     box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Легкая тень для объема */
     background-color: #f9f9f9;    /* Светлый фон карточки */
+	width: 100%; /* Элемент занимает всю доступную ширину родителя */
     max-width: none;             /* Ограничиваем ширину карточки */
   }
 
@@ -143,7 +144,7 @@ pre {
     height: 150px;
 }
 
-
+/* mobile */
 @media (min-width:950px) {
 
 .h1logo {
